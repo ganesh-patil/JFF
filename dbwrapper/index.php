@@ -60,15 +60,26 @@ class databaseOperations{
         }
     }
      function limit (integer $limit , $offset=null){
-
+         $this->limit='';
+           if($offset != null && $limit!=0){
+               $this->limit="LIMIT ".$offset.",".$limit;
+           }
+         elseif($limit !=0){
+             $this->limit="LIMIT ".$limit;
+         }
    }
 
    function getInstance(){
+       if(!isset(self::$connectionObject))
+           self::$connectionObject = new PDO('mysql:host=localhost;dbname=test', 'root', 'webonise6186');
+
+       return self::$connectionObject;
 
    }
 
     function get (){
-
+        $db=$this->getInstance();
+        $db->query($this->select()->from()->where()->orderby()->limit()->query());
     }
      function query (string $query) {
 
