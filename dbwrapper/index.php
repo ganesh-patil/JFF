@@ -1,12 +1,13 @@
 <?php
 class databaseOperations{
     private static $connectionObject;
-    private $select;
-    private $from;
-    private $where;
-    private $orderby;
-    private $groupby;
-    private $limit;
+    private $select='';
+    private $from='';
+    private $where='';
+    private $orderby='';
+    private $groupby='';
+    private $limit='';
+    private $delete='';
     private $host="localhost";
     private  $username="root";
     private $password="ganesh";
@@ -106,6 +107,7 @@ class databaseOperations{
     }
 
      function query ($query) {
+         print_r($query);die;
          $dbo=$this->getInstance();
          return $dbo->prepare($query);
      }
@@ -114,92 +116,122 @@ class databaseOperations{
         $result->execute();
         return $result->fetchAll();
     }
-    function displayOrganization($allOrganizations){
+    function displayOrganizations($allOrganizations){
          foreach($allOrganizations as $organization){
          echo $organization['name']."\n";
-}
-}
+    }
+   }
+
+    function displayOrganizationDetails($allOrganizations){
+        foreach($allOrganizations as $organization){
+            echo $organization['id']."\n";
+            echo $organization['name']."\n";
+            echo $organization['created_on']."\n";
+        }
+    }
+
+    function delete($tableName, $conditions=null ){
+        $delete='';
+        $where=" WHERE 1=1 ";
+        if($tableName){
+            $delete .= "DELETE * FROM ".$tableName." ";
+            if(!empty($conditions)){
+                if(is_array($conditions)){
+                    foreach($conditions as $condition){
+                      $where .= " AND ".$condition." ";
+                    }
+                }
+                else {
+                    $where .= "  AND ".$conditions." ";
+                }
+            }
+            $delete .= $where;
+        }
+        return $delete;
+    }
+
+    function update($tableName,$values,$conditions=null){
+        $update='';
+        $where=" WHERE 1=1 ";
+        $set_value='';
+        if($tableName && !empty($values)){
+            $update="UPDATE table ".$tableName." SET ";
+            if(is_array($values)){
+                foreach ($values as $value){
+                    $set_value .= $value." ";
+                }
+            }
+            else{
+                $set_value .= $values." ";
+            }
+            if(!empty($conditions)){
+                if(is_array($conditions)){
+                    foreach($conditions as $condition){
+                        $where .= " AND ".$condition." ";
+
+                    }
+                }
+                else {
+                    $where .= "  AND ".$conditions." ";
+                }
+            }
+            $update.= $set_value.$where;
+        }
+        return $update;
+    }
     function dbOperations(){
         $dboInstance=new databaseOperations();
-        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where()->get()));
-        $dboInstance->displayOrganizations($allOrganizations);
-
-        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("Id > 10")->limit(10)->get()));
-        $dboInstance->displayOrganizations($allOrganizations);
+//        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where()->get()));
+//        $dboInstance->displayOrganizations($allOrganizations);
 
 
-        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("Id > 10")->limit(40,0)->get()));
-        $dboInstance->displayOrganizations($allOrganizations);
+//        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("Id > 10")->limit(10)->get()));
+//        $dboInstance->displayOrganizations($allOrganizations);
+//
+//
+//        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("Id > 10")->limit(40,0)->get()));
+//        $dboInstance->displayOrganizations($allOrganizations);
 
-//        $query=$dboInstance->select("name")->from("organizations")->where("created_on > '2013-02-10 00:00:00 '")->get();
-//        $result =$dboInstance->query($query);
-//        $result->execute();
-//        $allOrganizations=$result->fetchAll();
-//        foreach($allOrganizations as $organization){
-//            echo $organization['name']."\n";
-//        }
+
+//        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("created_on > '2013-02-10 00:00:00 '")->get()));
+//        $dboInstance->displayOrganizations($allOrganizations);
 
 //        $where=array();
 //        array_push($where,"Id > 10");
 //        array_push($where,"Id < 50");
-//        $query=$dboInstance->select("name")->from("organizations")->where($where)->orderBy("name","DESC")->get();
-//        print_r($query);
-//        $result =$dboInstance->query($query);
-//        $result->execute();
-//        $allOrganizations=$result->fetchAll();
-//        foreach($allOrganizations as $organization){
-//            echo $organization['name']."\n";
-//        }
+//        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where($where)->orderBy("name","DESC")->get()));
+//        $dboInstance->displayOrganizations($allOrganizations);
 
-//        $query=$dboInstance->select("*")->from("organizations")->where("Id=70")->get();
-//        print_r($query);
-//        $result =$dboInstance->query($query);
-//        $result->execute();
-//        $allOrganizations=$result->fetchAll();
-//        foreach($allOrganizations as $organization){
-//            echo $organization['id']."\n";
-//            echo $organization['name']."\n";
-//            echo $organization['created_on']."\n";
-//        }
 
-//        $query=$dboInstance->select("*")->from("organizations")->where("name='Org Name 30'")->get();
-//        print_r($query);
-//        $result =$dboInstance->query($query);
-//        $result->execute();
-//        $allOrganizations=$result->fetchAll();
-//        foreach($allOrganizations as $organization){
-//            echo $organization['id']."\n";
-//            echo $organization['name']."\n";
-//            echo $organization['created_on']."\n";
-//        }
+//        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("*")->from("organizations")->where("Id=70")->get()));
+//        $dboInstance->displayOrganizationDetails($allOrganizations);
 
-//        $query=$dboInstance->select("*")->from("users")->where("organisation_id = 30")->get();
-//        print_r($query);
-//        $result =$dboInstance->query($query);
-//        $result->execute();
-//        $allOrganizations=$result->fetchAll();
-//        foreach($allOrganizations as $organization){
-//            echo $organization['id']."\n";
-//            echo $organization['fname']."\n";
-//            echo $organization['lname']."\n";
-//        }
-
-//          $select=array();
+//        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("*")->from("organizations")->where("name='Org Name 30'")->get()));
+//        $dboInstance->displayOrganizationDetails($allOrganizations);
+//
+//        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("*")->from("users")->where("organisation_id = 30")->get()));
+//        $dboInstance->displayOrganizationDetails($allOrganizations);
+//
+//        $select=array();
 //        array_push($select,"COUNT( u.id ) AS count");
 //        array_push($select,"o.name");
 //        $from=array();
 //        array_push($from,"`users` u");
 //        array_push($from,"`organizations` o");
-//
-//        $query=$dboInstance->select($select)->from($from)->where("u.organisation_id = o.id")->groupBy("o.name")->get();
-//        print_r($query);
-//        $result =$dboInstance->query($query);
-//        $result->execute();
-//        $allOrganizations=$result->fetchAll();
+//        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select($select)->from($from)->where("u.organisation_id = o.id")->groupBy("o.name")->get()));
 //        foreach($allOrganizations as $organization){
 //            echo $organization['count']."\n";
 //            echo $organization['name']."\n";
 //        }
+
+//        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->delete('users',"city ='city7'")));
+
+        $update_values=array();
+        array_push($update_values,"fname = 'abc'");
+        array_push($update_values,"lname = 'xyz'");
+        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->update('users',$update_values,"city ='city7'")));
+
+
 
     }
 
