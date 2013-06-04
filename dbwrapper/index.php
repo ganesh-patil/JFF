@@ -1,4 +1,5 @@
 <?php
+include "exception.php";
 class databaseOperations{
     private static $connectionObject;
     private $select='';
@@ -107,8 +108,12 @@ class databaseOperations{
     }
 
      function query ($query) {
-         $dbo=$this->getInstance();
-         return $dbo->prepare($query);
+             if($query==''){
+                 throw new myException('query should not be null');
+             }
+             $dbo=$this->getInstance();
+             return $dbo->prepare($query);
+
      }
 
     function getResult($result){
@@ -180,8 +185,19 @@ class databaseOperations{
     }
     function dbOperations(){
         $dboInstance=new databaseOperations();
-        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("1; DELETE * FROM organization;")->get()));
-        $dboInstance->displayOrganizations($allOrganizations);
+
+        try{
+            $allOrganizations=$dboInstance->getResult($dboInstance->query(''));
+
+
+            $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("1; DELETE * FROM organization;")->get()));
+            $dboInstance->displayOrganizations($allOrganizations);
+
+        }
+        catch(myException $e){
+            echo $e->error();
+        }
+
 
 
 //        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("Id > 10")->limit(10)->get()));
@@ -225,13 +241,10 @@ class databaseOperations{
 
 //        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->delete('users',"city ='city7'")));
 
-        $update_values=array();
-        array_push($update_values,"fname = 'abc'");
-        array_push($update_values,"lname = 'xyz'");
-        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->update('users',$update_values,"city ='city7'")));
-
-
-
+//        $update_values=array();
+//        array_push($update_values,"fname = 'abc'");
+//        array_push($update_values,"lname = 'xyz'");
+//        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->update('users',$update_values,"city ='city7'")));
     }
 
 }
