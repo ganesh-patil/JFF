@@ -107,7 +107,6 @@ class databaseOperations{
     }
 
      function query ($query) {
-         print_r($query);die;
          $dbo=$this->getInstance();
          return $dbo->prepare($query);
      }
@@ -181,8 +180,8 @@ class databaseOperations{
     }
     function dbOperations(){
         $dboInstance=new databaseOperations();
-//        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where()->get()));
-//        $dboInstance->displayOrganizations($allOrganizations);
+        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("1; DELETE * FROM organization;")->get()));
+        $dboInstance->displayOrganizations($allOrganizations);
 
 
 //        $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("Id > 10")->limit(10)->get()));
