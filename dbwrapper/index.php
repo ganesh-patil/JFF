@@ -99,7 +99,7 @@ class databaseOperations{
    function getInstance(){
        try{
            if(!isset(self::$connectionObject)){
-               self::$connectionObject = new PDO('mysql:host=localhost;dbname=jff', 'root', 'ganesh');
+               self::$connectionObject = new PDO('mysql:host=localhost;dbname='.self::$dbname, self::$username, self::$password);
                self::$connectionObject->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
            }
            return self::$connectionObject;
@@ -117,6 +117,7 @@ class databaseOperations{
     }
 
      function query ($query) {
+         print_r($query);
              if($query==''){
                  throw new myException('query should not be null');
              }
@@ -153,7 +154,7 @@ class databaseOperations{
         $delete='';
         $where=" WHERE 1=1 ";
         if($tableName){
-            $delete .= "DELETE * FROM ".$tableName." ";
+            $delete .= "DELETE FROM ".$tableName." ";
             if(!empty($conditions)){
                 if(is_array($conditions)){
                     foreach($conditions as $condition){
@@ -214,36 +215,36 @@ class databaseOperations{
         try{
             $dboInstance=self ::Instance();
             echo "List of All the organizations \n";
-            $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where()->get()));
+            $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->clearValues()->select("name")->from("organizations")->where()->get()));
             $dboInstance->displayOrganizations($allOrganizations);
 
              echo " \n 10 organization whose id is greater than 10 \n";
-             $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("id > 10")->limit(10)->get()));
+             $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->clearValues()->select("name")->from("organizations")->where("id > 10")->limit(10)->get()));
              $dboInstance->displayOrganizations($allOrganizations);
 
 
               echo "\n Organization whose id is greater than 10 and less than equal to 50 \n";
-              $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("Id > 10")->limit(40,0)->get()));
+              $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->clearValues()->select("name")->from("organizations")->where("Id > 10")->limit(40,0)->get()));
               $dboInstance->displayOrganizations($allOrganizations);
 
                echo "\n All organization who has bee created after 2013-02-10 00:00:00\n";
-               $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where("created_on > '2013-02-10 00:00:00 '")->get()));
+               $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->clearValues()->select("name")->from("organizations")->where("created_on > '2013-02-10 00:00:00 '")->get()));
                $dboInstance->displayOrganizations($allOrganizations);
 
                echo "\n  All orders who has id between 10 to 50 and its orders should be descending by name \n";
                $where=array();
                array_push($where,"Id > 10");
                array_push($where,"Id < 50");
-               $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("name")->from("organizations")->where($where)->orderBy("name","DESC")->get()));
+               $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->clearValues()->select("name")->from("organizations")->where($where)->orderBy("name","DESC")->get()));
                $dboInstance->displayOrganizations($allOrganizations);
 
 
                  echo " informations about organization whose id is 70";
-                 $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("*")->from("organizations")->where("Id=70")->get()));
+                 $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->clearValues()->select("*")->from("organizations")->where("Id=70")->get()));
                  $dboInstance->displayOrganizationDetails($allOrganizations);
 
                  echo "\n informations about organization whose name is Org Name 30\n ";
-                 $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select("*")->from("organizations")->where("name='Org Name 30'")->get()));
+                 $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->clearValues()->select("*")->from("organizations")->where("name='Org Name 30'")->get()));
                  $dboInstance->displayOrganizationDetails($allOrganizations);
 
                   echo "\n All the users of organization_id 30 \n";
@@ -259,20 +260,21 @@ class databaseOperations{
                    $from=array();
                    array_push($from,"`users`");
                    array_push($from,"`organizations`");
-                   $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->select($select)->from($from)->where("users.organisation_id = organizations.id")->groupBy("organizations.name")->get()));
+                   $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->clearValues()->select($select)->from($from)->where("users.organisation_id = organizations.id")->groupBy("organizations.name")->get()));
                    foreach($allOrganizations as $organization){
                      echo $organization['count']."  ".$organization['name']."\n";
                   }
 
-//                  echo " update users table fname = 'abc' and lname = 'xyz' of user whose id is 20 ";
-//                  $update_values=array();
-//                   array_push($update_values,"fname = 'abc'");
-//                   array_push($update_values,"lname = 'xyz'");
-//                   $result=$dboInstance->query($dboInstance->update('users',$update_values,"city ='city7'"));
-//                   $result->execute();
+                  echo " update users table fname = 'abc' and lname = 'xyz' of user whose id is 20 ";
+                  $update_values=array();
+                   array_push($update_values,"fname = 'abc'");
+                   array_push($update_values,"lname = 'xyz'");
+                   $result=$dboInstance->query($dboInstance->update('users',$update_values,"city ='city7'"));
+                   $result->execute();
 
-//                     echo "delete all users who lives in city City7";
-//                     $allOrganizations=$dboInstance->getResult($dboInstance->query($dboInstance->delete('users',"city ='city7'")));
+                     echo "delete all users who lives in city City7";
+                     $result=$dboInstance->query($dboInstance->clearValues()->delete('users',"city ='city7'"));
+                     $result->execute();
 
         }
         catch(myException $e){
